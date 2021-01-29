@@ -4,7 +4,7 @@
 \usepackage{graphicx,url}
 \usepackage[utf8]{inputenc}
 \usepackage[brazil]{babel}
-
+\usepackage[hidelinks,hyperindex,breaklinks]{hyperref}
      
 \sloppy
 
@@ -23,31 +23,59 @@
 \maketitle
 
 \begin{abstract}
-  This article presents the application of the decision tree and feed-forward artificial neural network algorithms in a database containing information about DotA game matches, aiming at data classification. This report is part of the deliverable associated to the task proposed by professor Reginaldo Cordeiro dos Santos Filho for the Artificial Intelligence course, taught under the Computer Science Bachelor’s degree program at the Federal University of Pará.
+  This article presents the application of the decision tree and feed-forward artificial neural network algorithms in a database containing information about DotA2 game matches, aiming at data classification. This report is part of the deliverable associated to the task proposed by professor Reginaldo Cordeiro dos Santos Filho for the Artificial Intelligence course, taught under the Computer Science Bachelor’s degree program at the Federal University of Pará.
 \end{abstract}
      
 \begin{resumo} 
-  Este artigo apresenta a aplicação dos algoritmos de árvore de decisão e rede neural artificial \textit{feed-forward} em uma base de dados contendo informações sobre partidas do jogo DotA, visando a classificação dos dados. Este trabalho é parte do entregável relativo à tarefa proposta pelo Prof. Dr. Reginaldo Cordeiro dos Santos Filho para a disciplina de Inteligência Artificial, ministrada sob o curso de Bacharelado em Ciência da Computação na Universidade Federal do Pará.
+  Este artigo apresenta a aplicação dos algoritmos de árvore de decisão e rede neural artificial \textit{feed-forward} em uma base de dados contendo informações sobre partidas do jogo DotA2, visando a classificação dos dados. Este trabalho é parte do entregável relativo à tarefa proposta pelo Prof. Dr. Reginaldo Cordeiro dos Santos Filho para a disciplina de Inteligência Artificial, ministrada sob o curso de Bacharelado em Ciência da Computação na Universidade Federal do Pará.
 \end{resumo}
 
 
 \section{Introdução}\label{sec:intro}
 A descoberta de conhecimento em base de dados (\textit{Knowledge Discovery in Databases} ou KDD) é o processo de descoberta de padrões válidos, potencialmente úteis e entendíveis a partir de dados. De modo geral, o KDD divide-se em 5 etapas: seleção; pré-processamento; transformação; mineração de dados; e interpretação de resultados \cite{fayyad}. Na etapa de mineração de dados, tem-se diversas tarefas; dentre elas, a classificação, responsável por rotular os dados em classes previamente definidas.
 
-Nesse contexto, o terceiro trabalho da disciplina Inteligência Artificial propõe a realização do KDD em uma base de dados qualquer advinda do site \textit{UCI Machine Learning Repository}, considerando a utilização dos algoritmos de árvore de decisão e rede neural artificial para a tarefa de classificação na etapa de mineração de dados. Para tal, foi escolhido um repositório contendo informações sobre partidas do jogo DotA2, cuja classificação tenta predizer qual time ganhou a partida com base nos atributos considerados.
+Nesse contexto, o terceiro trabalho da disciplina Inteligência Artificial propõe a realização do KDD em uma base de dados qualquer advinda do site \textit{UCI Machine Learning Repository}, considerando a utilização dos algoritmos de árvore de decisão e rede neural artificial para a tarefa de classificação na etapa de mineração de dados. Para tal, foi escolhido um repositório contendo informações sobre partidas do jogo DotA2, cuja classificação tenta predizer qual time ganhou a partida.
 
-Diante disso, as seções subsquentes estão dividas da seguinte forma: a Seção \ref{sec:descricao} apresenta a descrição da base de dados selecionada; a Seção \ref{sec:metodologia} descreve o processo de realização do trabalho; a Seção \ref{sec:resultados} apresenta os resultados da aplicação dos algoritmos; a Seção \ref{sec:analise} apresenta a comparação entre os dois algoritmos; por fim, a Seção \ref{sec:conclusao} sintetiza o trabalho e apresenta as considerações finais.
+Diante disso, este trabalho se divide da seguinte forma: a Seção \ref{sec:descricao} apresenta a descrição da base de dados selecionada; a Seção \ref{sec:metodologia} descreve o processo de realização do trabalho; a Seção \ref{sec:resultados} apresenta os resultados da aplicação dos algoritmos; a Seção \ref{sec:analise} apresenta a comparação entre os dois algoritmos; por fim, a Seção \ref{sec:conclusao} sintetiza o trabalho e apresenta as considerações finais.
 
 \section{Descrição da base de dados}\label{sec:descricao}
+A base de dados escolhida, denominada \textit{DotA2 Game Results}, contém informações de partidas do jogo \textit{Defense of the Ancients} (DotA) e foi retirada do site \textit{UCI Machine Learning Repository}. Nesse jogo, vários modos e tipos de jogo podem ser escolhidos. Em todos eles, duas equipes compostas por 5 jogadores batalham entre si com diferentes heróis (personagens). Sendo assim, essa base contém 102.944 instâncias e 117 atributos (1 variável a ser predita/116 variáveis independentes). Nesses atributos, tem-se:
+
+\begin{itemize}
+	\item{\textbf{Time vencedor:}} variável a ser predita. Representa qual dos dois times ganhou a partida (-1 ou 1);
+	\item{\textbf{ID de Cluster:}} variável categórica que indica a região em que o jogador está jogando; 
+	\item{\textbf{Modo de jogo:}} variável categórica que indica o modo de jogo. Exemplo: \textit{all pick};
+	\item{\textbf{Tipo de jogo:}} variável categórica que indica o tipo de jogo. Exemplo: \textit{ranked};
+	\item{\textbf{Herói \{0, 1, ..., 111, 112\}:}} esse atributo se espalha por 113 colunas (uma para cada herói do jogo) e indica quais dos heróis foram utilizados pelos times: -1 se um time utilizou o herói; 0 se nenhum dos times utilizou o herói; e 1 se o outro time utilizou o herói.
+\end{itemize}
+
+Além disso, essa base encontra-se dividida em dois arquivos: \texttt{dota2Train.csv} e \texttt{dota2Test.csv}. A divisão original feita entre treino e teste, contudo, foi 90\%-10\%, enquanto que o estipulado para este trabalho é um \textit{Holdout} 70\%-30\%. Dessa forma, foi necessária a realização de um pré-processamento, a ser explicado na Seção \ref{sec:metodologia}, para resolver esse e outros problemas encontrados na base. 
+
+A princípio, este conjunto de dados aparenta ser um pouco escasso em características, uma vez que praticamente não descreve características relacionadas ao desempenho dos jogadores no jogo (basicamente, as únicas características que envolvem os jogadores são as dos heróis, que expõem se uma das equipes escolheu um dado herói ou não). Considerando que esse é um jogo em que a atuação dos jogadores é decisiva em termos de desfecho (e.g., através de acúmulo de ouro, compra de itens, assistências, assassinatos e mortes), tem-se que este conjunto de dados certamente não possui um quadro tão abrangente quanto deveria.
 
 \section{Metodologia do trabalho}\label{sec:metodologia}
+De modo geral, este trabalho se dividiu em quatro etapas: tratamento da base de dados; seleção de características; aplicação dos algoritmos; e escrita do artigo.
 
+Conforme mencionado anteriormente, alguns problemas foram encontrados na base de dados original. Esses problemas são: o tamanho de um arquivo \texttt{.csv} é substancialmente maior do que poderia ser, comparando com um arquivo \texttt{.h5}, uma vez que não há compressão nele; a divisão entre treino e teste é de 90\%-10\%, ao invés de 70\%-30\%; a variável a ser predita está no mesmo arquivo que as variáveis independentes; algumas colunas possuem sempre os mesmos valores, sendo irrelevantes e agravando o problema da dimensionalidade. Dessa forma, a base dados precisou ser tratada.
+
+Inicialmente, os arquivos \texttt{.csv} foram concatenados, as colunas irrelevantes foram removidas e o arquivo foi salvo em formato \texttt{.h5}. Em seguida, a base foi dividida aplicando o \textit{Holdout} estratificado 70\%-30\%, conforme o estipulado para este trabalho. Por fim, foi realizada uma codificação das três variáveis categóricas para versões \textit{target-encoded} utilizando o algoritmo \textit{\textbf{K}-Fold Target Encoding}, com o objetivo de melhorar o conjunto de dados aos olhos dos algoritmos a serem empregados.
+
+Feito isso, foi realizada a seleção de características para tentar descobrir quais são os atributos melhor correlacionados com a variável a ser predita e reduzir a alta dimensionalidade da base. Uma vez que as implementações da árvore de decisão e da rede neural \textit{feed-forward} a serem utilizadas neste trabalho provêm da biblioteca \texttt{scikit-learn}, as funções usadas para pontuar as caracterísitcas foram \textit{ANOVA F-value}, \textit{Mutual Information} e \textit{Decision-tree feature importance}, da mesma biblioteca.
+
+No intuito de verificar qual dos classificadores de características teve o melhor desempenho e qual número de características deveria ser escolhido, vários modelos foram gerados para realizar a validação cruzada usando o algoritmo \textit{Stratified \textbf{K}-Fold}. Com base nos resultados obtidos, definiu-se que os modelos a serem produzidos deveriam aprender apenas com as 5 características (sendo elas todas heróis) melhor correlacionadas de acordo com o classificador \textit{ANOVA F-value}. 
+
+Com os aspectos importantes dos modelos a serem construídos definidos, passou-se para a aplicação dos algoritmos. Inicialmente, foi criado um modelo \textit{baseline} no qual, devido ser uma classificação binária, sempre prevê o rótulo que mais aparece. Para fins de comparação, a acurácia desse modelo também foi calculada. Em seguida, os algoritmos de árvore de decisão e rede neural \textit{feed-forward} foram executados 10 vezes, sendo coletadas em cada execução as métricas para a base de treinamento, base de teste e base completa. Essas métricas são a matriz de confusão, a sensibilidade, a especificidade, as confiabilidades positiva e negativa e a acurácia, conforme estipulado para o trabalho. 
+	
 \section{Resultados}\label{sec:resultados}
 
 \section{Análise comparativa}\label{sec:analise}
 
 \section{Conclusão}\label{sec:conclusao}
+Diante do exposto acima, nota-se que a acurácia de teste dos algoritmos de árvore de decisão e rede neural não superaram em muito o modelo \textit{baseline} criado. Além disso, as acurácias de ambos os algoritmos são similares, variando menos que 2\%.  Considerando que o tempo de treinamento da rede neural é consideravelmente maior do que o da árvore de decisão, tem-se que o melhor algoritmo em geral para lidar com o conjunto de dados selecionado é a árvore de decisão. 
 
+Contudo, cabe mencionar que outras técnicas poderiam ser testadas na tentativa de melhorar a acurácia, como substituir a seleção de características por extração de características através de técnicas de redução de dimensionalidade \textit{embedding-based}. Apesar disso, considerando as informações contidas no conjunto de dados analisado e com base no que se sabe acerca do contexto do problema, tem-se que o maior problema é a falta de informações mais relevantes e decisivas acerca da partida, como a quantidade de ouro coletada, mortes, abates, assistências, tempo de partida, entre outros. 
+
+Por fim, ressalta-se que a ferramenta GitHub foi utilizada como sistema de versionamento no decorrer do desenvolvimento deste trabalho, de forma que as contribuições dos integrantes desta equipe possam ser registradas e vistas. Neste repositório encontra-se um arquivo \texttt{.ipynb} (i.e., um Jupyter Notebook) informando de maneira mais detalhada o tratamento da base de dados, a seleção de atributos, a aplicação dos algoritmos e os resultados obtidos. Todas essas contribuições adicionais podem ser encontradas em \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}.
 
 
 \bibliographystyle{sbc}

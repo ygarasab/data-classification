@@ -1,3 +1,0 @@
-# tex
-
-artigo entregável

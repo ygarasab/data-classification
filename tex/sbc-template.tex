@@ -87,7 +87,7 @@ Na \autoref{fig:modelos-classif} é possível observar como o aumento do número
 
 Já na \autoref{fig:modelos-alg}, que expõe as mesmas medidas da figura anterior só que agrupadas por algoritmo ao invés de classificador, é possível perceber que há números de características ótimos diferentes para cada algoritmo. Para a árvore de decisão, o melhor tamanho aparenta ser por volta de 10. No caso da rede neural, por volta de 30.
 
-Finalizando a etapa de seleção de características, foi feita uma última análise acerca do tempo médio de treino dos algoritmos. Na  \autoref{fig:tempo-treino}, observa-se como o aumento no número de características impacta o tempo de treinamento da árvore de decisão (DT) e da rede neural (MLP). Com isso, tem-se que é muito mais custoso treinar uma rede neural do que uma árvore de decisão, conforme esperado. 
+Finalizando a etapa de seleção de características, foi feita uma última análise acerca do tempo médio de treino dos algoritmos. Na  \autoref{fig:tempo-treino}, observa-se como o aumento no número de características impacta o tempo de treinamento da árvore de decisão (DT) e da rede neural (MLP). Com isso, constatou-se que é muito mais custoso treinar uma rede neural do que uma árvore de decisão, conforme já era esperado. 
 
 \begin{figure}[t!]
     \includegraphics[width=\linewidth]{figures/tempo_treino}
@@ -97,7 +97,7 @@ Finalizando a etapa de seleção de características, foi feita uma última aná
 
 Considerando as informações obtidas até o momento, as seguintes decisões foram feitas: o classificador \textit{ANOVA F-value} foi escolhido para ser utilizado; a rede neural utilizará as 30 características melhor correlacionadas; e a árvore de decisão utilizará as 10 características melhor correlacionadas.
 
-Antes da aplicação dos algoritmos, contudo, foi necessário definir o valor da profundidade máxima da árvore de decisão. Nesse sentido, sabe-se que, com os valores-padrão da implementação do \texttt{scikit-learn} da árvore de decisão, há uma tendência que ocorra \textit{overfitting}. Isso foi constatado ao visualizar a árvore de decisão construída até o momento, conforme ilustra a \autoref{fig:arvore_padrao}, a qual possui 20 como valor padrão para a profundidade máxima.
+Antes da aplicação dos algoritmos, contudo, foi necessário definir o valor da profundidade máxima da árvore de decisão. Nesse sentido, sabe-se que, com os valores-padrão da implementação do \texttt{scikit-learn} da árvore de decisão, há uma tendência que ocorra \textit{overfitting}. Isso foi constatado ao visualizar a árvore de decisão construída até o momento, ilustrada na \autoref{fig:arvore_padrao}, a qual possui 20 como valor padrão para a profundidade máxima.
 
 \begin{figure}[t!]
     \includegraphics[width=\linewidth]{figures/arvore_padrao}
@@ -113,7 +113,7 @@ No intuito de resolver esse problema, foram testadas todas as profundidades no i
     \label{fig:acuracia_profundidade}
 \end{figure}
 
-Testando a árvore quando a profundidade máxima é igual a 3, 5 e 7, obtém-se os resultados exibidos na \autoref{fig:arvore357}. Considerando o número de características (10), estipulou-se como razoável adotar a profundidade máxima da árvore como 3.
+Testando a árvore quando a profundidade máxima é igual a 3, 5 e 7, obtém-se os resultados exibidos na \autoref{fig:arvore357}. Considerando o número de atributos que serão utilizados (10), estipulou-se como razoável adotar a profundidade máxima da árvore como 3.
 
 \begin{figure}[t!]
     \includegraphics[width=\linewidth]{figures/arvore_357}
@@ -125,13 +125,20 @@ Já na etapa de aplicação dos algoritmos, inicialmente foi criado um modelo \t
 
 Em seguida, os algoritmos foram aplicados, sendo executados 10 vezes cada. As medidas coletadas para cada execução, conforme pedido para este trabalho, foram a matriz de confusão, sensibilidade, especificidade, confiabilidade positiva, confiabilidade negativa e acurácia. A tabela contendo esses resultados pode ser encontrada no Jupyter Notebook no repositório \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}.
 
-Por fim, foram calculados a média e o desvio padrão da acurácia total do conjunto de modelos construídos para cada algoritmo, que estão ilustrados na \autoref{fig:resultados}.
+Por fim, foram calculados a média e o desvio padrão da acurácia total do conjunto de modelos construídos para cada algoritmo, que estão ilustrados na \autoref{tab:resultados}.
 
-\begin{figure}[t!]
-    \includegraphics[width=\linewidth]{figures/resultados}
-    \caption{Média e desvio padrão da acurácia total para cada algoritmo. Fonte: acervo próprio.}
-    \label{fig:resultados}
-\end{figure}
+\begin{table}[]
+	\caption{Média e desvio padrão da acurácia total dos modelo para cada algoritmo.}
+	\centering
+	\begin{tabular}{|l|l|l|}
+	\hline
+	\textbf{Base}  & \textbf{Árvore de decisão} & \textbf{Rede neural} \\ \hline
+	Base de treino & 53.166\% ± 0.277\%           & 54.643\% ± 0.143\%     \\ \hline
+	Base de teste  & 53.04\% ± 0.248\%            & 58.375\% ± 0.170\%     \\ \hline
+	Base completa  & 53.223\% ± 0.305\%           & 59.139\% ± 0.125\%     \\ \hline
+	\end{tabular}
+	\label{tab:resultados}
+\end{table}
 
 De modo geral, tem-se que a árvore de decisão construída seguiu o padrão do \texttt{scikit-learn}, diferenciando-se desse por possuir profundidade máxima igual a 3 e utilizar as 10 características melhor correlacionadas de acordo com o \textit{ANOVA F-value}. Quanto à rede neural, ela também seguiu o padrão do \texttt{scikit-learn}, diferenciando-se desse por possuir o número de neurônios da camada oculta como sendo \textit{(número de entradas + número de saídas) / 2} e utilizar as 30 características melhor correlacionadas de acordo com o \textit{ANOVA F-value}. A rede neural construída pode ser vista na \autoref{fig:ann}.
 
@@ -145,16 +152,18 @@ Sendo assim, tem-se que a rede neural possui a seguinte arquitetura: 3 camadas (
 
 \section{Análise comparativa}\label{sec:analise}
 
-Com os resultados expostos acima, mais especificamente na \autoref{fig:resultados}, podemos observar como os dois algoritmos apesentam acurácia semelhante para ambas baes de treino e de teste, sendo que a rede neural utilizada chegou a apresentar resultados melhores para a base de treino. Assim, podemos desconsiderar a ideia do \textit{overfitting} do nosso modelo, e apontar a validade de seus resultados.
+A partir dos resultados expostos acima, mais especificamente da \autoref{tab:resultados}, é possível observar como os dois algoritmos apresentam acurácia semelhante para as bases de treino e de teste. Contudo, percebe-se que a rede neural utilizada apresentou resultados melhores para a base de treino. Assim, pode-se desconsiderar a ideia do \textit{overfitting} do modelo construído e apontar a validade de seus resultados.
 
-Além disso, ao fazer análise da tabela completa com as medidas de cada execução presente em \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}, nos deparamos com uma alta sensibilidade em nossa árvore de decisão, o que demonstra a sua eficiência na determinação de seus nós, e refletindo a decisão anterior de redução da profundidade.
+Além disso, a tabela com as métricas de cada execução (disponível no repositório do GitHub) demonstra a presença de uma alta sensibilidade na árvore de decisão, validando a eficiência na determinação de seus nós e a decisão anterior de redução da profundidade.
 
-Por fim, voltando-se para os resultados, nota-se que a acurácia de teste dos algoritmos de árvore de decisão e rede neural não superaram em muito o modelo \textit{baseline} criado. Além disso, as acurácias de ambos os algoritmos são relativamente similares.  Considerando que o tempo de treinamento da rede neural é consideravelmente maior do que o da árvore de decisão, tem-se que o melhor algoritmo em geral para lidar com o conjunto de dados selecionado é a árvore de decisão. 
+Em geral, nota-se que a acurácia de teste dos algoritmos de árvore de decisão e rede neural não superaram em muito o modelo \textit{baseline} criado. Além disso, as acurácias de ambos os algoritmos são relativamente similares.  Considerando que o tempo de treinamento da rede neural é consideravelmente maior do que o da árvore de decisão, tem-se que o melhor algoritmo em geral para lidar com o conjunto de dados selecionado é a árvore de decisão. 
 
 \section{Conclusão}\label{sec:conclusao}
 
 
-Tendo em mente o exposto, cabe mencionar que outras técnicas poderiam ser testadas na tentativa de melhorar a acurácia, como substituir a seleção de características por extração de características através de técnicas de redução de dimensionalidade \textit{embedding-based}. Apesar disso, considerando as informações contidas no conjunto de dados analisado e com base no que se sabe acerca do contexto do problema, tem-se que o maior problema é a falta de informações mais relevantes e decisivas acerca da partida, como a quantidade de ouro coletada, mortes, abates, assistências, tempo de partida, entre outros. 
+Diante do exposto, tem-se que a árvore de decisão foi o melhor algoritmo para lidar com o conjunto de dados selecionado para este trabalho. Apesar de possuir uma acurácia menor que a da rede neural, a alta sensibilidade demonstrada por esse algoritmo e o tempo de treinamento notavelmente menor que o da rede foram motivos suficientes para considerar a árvore de decisão como o melhor algoritmo.
+
+Contudo, cabe mencionar que outras técnicas poderiam ser testadas na tentativa de melhorar a acurácia, como substituir a seleção de características por extração de características através de técnicas de redução de dimensionalidade \textit{embedding-based}. Apesar disso, considerando as informações contidas no conjunto de dados analisado e com base no que se sabe acerca do contexto do problema, tem-se que o maior problema é a falta de informações mais relevantes e decisivas acerca da partida, como a quantidade de ouro coletada, mortes, abates, assistências, tempo de partida, entre outros. 
 
 Assim, ressalta-se que a ferramenta GitHub foi utilizada como sistema de versionamento no decorrer do desenvolvimento deste trabalho, de forma que as contribuições dos integrantes desta equipe possam ser registradas e vistas. Neste repositório encontra-se um arquivo \texttt{.ipynb} (i.e., um Jupyter Notebook) informando de maneira mais detalhada o tratamento da base de dados, a seleção de atributos, a aplicação dos algoritmos e os resultados obtidos. Todas essas contribuições adicionais podem ser encontradas em \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}.
 

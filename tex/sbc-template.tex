@@ -56,17 +56,92 @@ A princípio, este conjunto de dados aparenta ser um pouco escasso em caracterí
 \section{Metodologia do trabalho}\label{sec:metodologia}
 De modo geral, este trabalho se dividiu em quatro etapas: tratamento da base de dados; seleção de características; aplicação dos algoritmos; e escrita do artigo.
 
-Conforme mencionado anteriormente, alguns problemas foram encontrados na base de dados original. Esses problemas são: o tamanho de um arquivo \texttt{.csv} é substancialmente maior do que poderia ser, comparando com um arquivo \texttt{.h5}, uma vez que não há compressão nele; a divisão entre treino e teste é de 90\%-10\%, ao invés de 70\%-30\%; a variável a ser predita está no mesmo arquivo que as variáveis independentes; algumas colunas possuem sempre os mesmos valores, sendo irrelevantes e agravando o problema da dimensionalidade. Dessa forma, a base dados precisou ser tratada.
+Conforme mencionado anteriormente, alguns problemas foram encontrados na base de dados original. Esses problemas são: o tamanho de um arquivo \texttt{.csv} é substancialmente maior do que poderia ser, comparando com um arquivo \texttt{.h5}, uma vez que não há compressão nele; a divisão entre treino e teste é de 90\%-10\%, ao invés de 70\%-30\%; a variável a ser predita está no mesmo arquivo que as variáveis independentes; e algumas colunas possuem sempre os mesmos valores, sendo irrelevantes e agravando o problema da dimensionalidade. Dessa forma, a base dados precisou ser tratada.
 
 Inicialmente, os arquivos \texttt{.csv} foram concatenados, as colunas irrelevantes foram removidas e o arquivo foi salvo em formato \texttt{.h5}. Em seguida, a base foi dividida aplicando o \textit{Holdout} estratificado 70\%-30\%, conforme o estipulado para este trabalho. Por fim, foi realizada a codificação das três variáveis categóricas para versões \textit{target-encoded} utilizando o algoritmo \textit{\textbf{K}-Fold Target Encoding}, com o objetivo de melhorar o conjunto de dados aos olhos dos algoritmos a serem empregados.
 
-Feito isso, foi realizada a seleção de características para tentar descobrir quais são os atributos melhor correlacionados com a variável a ser predita e reduzir a alta dimensionalidade da base. Uma vez que as implementações da árvore de decisão e da rede neural \textit{feed-forward} a serem utilizadas neste trabalho provêm da biblioteca \texttt{scikit-learn}, as funções usadas para pontuar as caracterísitcas foram \textit{ANOVA F-value}, \textit{Mutual Information} e \textit{Decision-tree feature importance}, da mesma biblioteca.
+Feito isso, foi realizada a seleção de características para tentar descobrir quais são os atributos melhor correlacionados com a variável a ser predita e reduzir a alta dimensionalidade da base. Uma vez que as implementações da árvore de decisão e da rede neural \textit{feed-forward} utilizadas neste trabalho provêm da biblioteca \texttt{scikit-learn}, as funções usadas para pontuar as caracterísitcas foram \textit{ANOVA F-value}, \textit{Mutual Information} e \textit{Decision-tree feature importance}, da mesma biblioteca.
 
 No intuito de verificar qual dos classificadores de características teve o melhor desempenho e qual número de características deveria ser escolhido, vários modelos foram gerados para realizar a validação cruzada sobre o conjunto de treinamento usando o algoritmo \textit{Stratified \textbf{K}-Fold}. Com base nos resultados obtidos, nota-se que há uma diferença entre o número de características ótimo para cada algoritmo: enquanto a árvore de decisão deve aprender com 10 características, a rede neural deve aprender com 30, sendo para ambos os casos as características melhor correlacionadas com a variável a ser predita de acordo com o classificador \textit{ANOVA F-value}. Para melhor detalhamento, recomenda-se a leitura do Jupyter Notebook no repositório \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}.
 
 Com os aspectos importantes dos modelos a serem construídos definidos, passou-se para a aplicação dos algoritmos. Inicialmente, foi criado um modelo \textit{baseline} no qual, devido ser uma classificação binária, sempre prevê o rótulo que mais aparece. Para fins de comparação, a acurácia desse modelo também foi calculada. Em seguida, os algoritmos de árvore de decisão e rede neural \textit{feed-forward} foram executados 10 vezes, sendo coletadas em cada execução as métricas para a base de treinamento, base de teste e base completa. Essas métricas são a matriz de confusão, a sensibilidade, a especificidade, as confiabilidades positiva e negativa e a acurácia, conforme estipulado para o trabalho. 
 	
 \section{Resultados}\label{sec:resultados}
+Na etapa de seleção de características, as funções \textit{ANOVA F-value}, \textit{Mutual Information} e \textit{Decision-tree feature importance} foram utilizadas para ranquear os atributos em termos de importância para a predição. Foi constatado que as dez características melhor correlacionadas na \textit{ANOVA F-value} são basicamente as mesmas que na \textit{Mutual information}, sendo todas elas não categóricas (i.e., heróis). Por outro lado, na \textit{Decision-tree feature importance}, as variáveis categórias (i.e., ID de Cluster, Modo de jogo e Tipo de jogo) ocuparam as três primeiras posições. Frente a isso, surgiram as perguntas: qual dos três classificadores teria o melhor desempenho? qual número de características a ser utilizado seria o melhor?
+
+Para responder a essas perguntas, foi necessário gerar vários modelos e realizar a validação cruzada deles. Utilizando o algoritmo \textit{Stratified \textbf{K}-Fold}, o conjunto de dados de treino foi dividido em 10 partes de forma que, a cada rodada, uma parte foi utilizada como teste as outras nove como treino. Quanto aos números de características, os tamanhos 5, 10, 15, 20, 25, 30, 50, 75 e 114 (todas as características) foram utilizados. Sendo assim, se o tamanho selecionado for 15 e o classificador escolhido for o \textit{ANOVA F-value}, por exemplo, então as 15 características melhor correlacionadas de acordo com esse classificador serão escolhidas para compor o modelo, que será então validado de forma cruzada. A partir dessa validação, a acurácia e pontuação F1 médias foram obtidas, e uma pontuação final foi criada a partir da média das duas medidas citadas.
+
+\begin{figure}[t!]
+    \includegraphics[width=\linewidth]{figures/modelos_por_classificador}
+    \caption{Métricas dos modelos por classificador. Fonte: acervo próprio.}
+    \label{fig:modelos-classif}
+\end{figure}
+
+Na \autoref{fig:modelos-classif} é possível observar como o aumento do número de características utilizadas impacta a acurácia, a pontuação F1 e a pontuação final (i.e., a média entre a acurácia e a pontuação F1) dos modelos resultantes. Nota-se que, com exceção do classificador \textit{Decision-tree feature importance}, a acurácia cai à médida em que o número de características aumenta. O comportamento desse classificador causa estranhamento, talvez indicando que ele não seja um bom estimador da correlação das características com os rótulos de classe.
+
+\begin{figure}[t!]
+    \includegraphics[width=\linewidth]{figures/modelos_por_algoritmo}
+    \caption{Métricas dos modelos por algoritmo. Fonte: acervo próprio.}
+    \label{fig:modelos-alg}
+\end{figure}
+
+Já na  \autoref{fig:modelos-alg}, que expõe as mesmas métricas da figura anterior só que agrupadas por algoritmo ao invés de classificador, é possível perceber que há números de características ótimos diferentes para cada algoritmo. Para a árvore de decisão, o melhor tamanho aparenta ser por volta de 10. No caso da rede neural, por volta de 30.
+
+Finalizando a etapa de seleção de características, foi feita uma última análise acerca do tempo médio de treino dos algoritmos. Na  \autoref{fig:tempo-treino}, observa-se como o aumento no número de características impacta o tempo de treinamento da árvore de decisão (DT) e da rede neural (MLP). Com isso, tem-se que é muito mais custoso treinar uma rede neural do que uma árvore de decisão, conforme já esperado. 
+
+\begin{figure}[t!]
+    \includegraphics[width=\linewidth]{figures/tempo_treino}
+    \caption{Tempo médio de treino para os algoritmos utilizados. Fonte: acervo próprio.}
+    \label{fig:tempo-treino}
+\end{figure}
+
+Considerando as informações obtidas até o momento, as seguintes decisões foram feitas: o classificador \textit{ANOVA F-value} foi escolhido para ser utilizado; a rede neural utilizará as 30 características melhor correlacionadas; e a árvore de decisão utilizará as 10 características melhor correlacionadas.
+
+Antes da aplicação dos algoritmos, contudo, foi necessário definir o valor da profundidade máxima da árvore de decisão. Nesse sentido, sabe-se que, com os valores-padrão da implementação do \texttt{scikit-learn} da árvore de decisão, há uma tendência que ocorra \textit{overfitting}. Isso foi constatado ao visualizar a árvore de decisão construída até o momento, conforme ilustra a \autoref{fig:arvore_padrao}, a qual possui 20 como valor padrão para a profundidade máxima.
+
+\begin{figure}[t!]
+    \includegraphics[width=\linewidth]{figures/arvore_padrao}
+    \caption{Árvore de decisão com profundidade máxima padrão. Fonte: acervo próprio.}
+    \label{fig:arvore_padrao}
+\end{figure}
+
+No intuito de resolver esse problema, foram testadas todas as profundidades no intervalo [1, 20] de modo a visualizar como a acurácia, a pontuação F1 e a pontuação final resultante evoluem à medida em que o valor da profundidade máxima aumenta. A \autoref{fig:acuracia_profundidade} mostra os resultados obtidos. 
+
+\begin{figure}[t!]
+    \includegraphics[width=\linewidth]{figures/acuracia_por_profundidade}
+    \caption{Evolução das métricas da árvore por profundidade. Fonte: acervo próprio.}
+    \label{fig:acuracia_profundidade}
+\end{figure}
+
+Testando a árvore quando a profundidade máxima é igual a 3, 5 e 7, obtém-se os resultados exibidos na \autoref{fig:arvore357}. Considerando o número de características (10), estipulou-se como razoável adotar a profundidade máxima da árvore como 3.
+
+\begin{figure}[t!]
+    \includegraphics[width=\linewidth]{figures/arvore_357}
+    \caption{Árvores de decisão com profundidade máxima 3, 5 e 7, respectivamente. Fonte: acervo próprio.}
+    \label{fig:arvore357}
+\end{figure}
+
+Já na etapa de aplicação dos algoritmos, inicialmente foi criado um modelo \textit{baseline} para fins de comparação com os algoritmos a serem utilizados. Como no caso em questão tem-se uma classificação binária, o modelo \textit{baseline} para este conjunto de dados seria prever sempre o rótulo que mais aparece. Dessa forma, a acurácia-base do modelo construído foi de 52, 7\%.
+
+Em seguida, os algoritmos foram aplicados, sendo executados 10 vezes cada. As métricas coletadas para cada execução, conforme pedido para este trabalho, foram a matriz de confusão, sensibilidade, especificidade, confiabilidade positiva, confiabilidade negativa e acurácia. A tabela contendo esses resultados pode ser encontrada no Jupyter Notebook no repositório \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}.
+
+Por fim, foram calculados a média e o desvio padrão da acurácia total do conjunto de modelos construídos para cada algoritmo, que estão ilustrados na \autoref{fig:resultados}.
+
+\begin{figure}[t!]
+    \includegraphics[width=\linewidth]{figures/resultados}
+    \caption{Média e desvio padrão da acurácia total para cada algoritmo. Fonte: acervo próprio.}
+    \label{fig:resultados}
+\end{figure}
+
+De modo geral, tem-se que a árvore de decisão construída seguiu o padrão do \texttt{scikit-learn}, diferenciando-se desse por possuir profundidade máxima igual a 3 e utilizar as 10 características melhor correlacionadas de acordo com o \textit{ANOVA F-value}. Quanto à rede neural, ela também seguiu o padrão do \texttt{scikit-learn}, diferenciando-se desse por possuir o número de neurônios da camada oculta como sendo \textit{(número de entradas + número de saídas) / 2} e utilizar as 30 características melhor correlacionadas de acordo com o \textit{ANOVA F-value}. A rede neural construída pode ser vista na \autoref{fig:ann}.
+
+Sendo assim, tem-se que a rede neural possui a seguinte arquitetura: 3 camadas (1 de entrada, com 30 neurônios; 1 oculta, com 15 neurônios; 1 de saída, com 1 neurônio); função de ativação Unidade Linear Retificada; otimizador baseado em gradiente estocástico \textit{Adam} para ajustar os pesos; e taxa de aprendizagem constante. Mais informações da arquitetura estão na documentação do \href{https://scikit-learn.org/stable/modules/generated sklearn.neural_network.MLPClassifier.html}{\texttt{MLPClassifier}}.
+
+\begin{figure}[t!]
+    \includegraphics[width=\linewidth]{figures/ann}
+    \caption{Arquitetura da rede neural utilizada. Fonte: acervo próprio.}
+    \label{fig:ann}
+\end{figure}
 
 \section{Análise comparativa}\label{sec:analise}
 

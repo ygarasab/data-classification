@@ -145,24 +145,18 @@ Sendo assim, tem-se que a rede neural possui a seguinte arquitetura: 3 camadas (
 
 \section{Análise comparativa}\label{sec:analise}
 
-tempo de execução
+Com os resultados expostos acima, mais especificamente na \autoref{fig:resultados}, podemos observar como os dois algoritmos apesentam acurácia semelhante para ambas baes de treino e de teste, sendo que a rede neural utilizada chegou a apresentar resultados melhores para a base de treino. Assim, podemos desconsiderar a ideia do \textit{overfitting} do nosso modelo, e apontar a validade de seus resultados.
 
-estabilidade na acurácia (sem overfitting)
+Além disso, ao fazer análise da tabela completa com as métricas de cada execução presente em \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}, nos deparamos com uma alta sensibilidade em nossa árvore de decisão, o que demonstra a eficiência da mesma na determinação de seus nós, e refletindo a decisão anterior de redução da profundidade.
 
-alta sensibilidade na árvore
-
-rede neural teve resultados melhores mas não condizentes ao seu tempo de construção
-
-árvore modelo mais eficiente
-
-(conflitoc com o texto de conclusão?)
+Por fim, voltando-se para os resultados, nota-se que a acurácia de teste dos algoritmos de árvore de decisão e rede neural não superaram em muito o modelo \textit{baseline} criado. Além disso, as acurácias de ambos os algoritmos são relativamente similares.  Considerando que o tempo de treinamento da rede neural é consideravelmente maior do que o da árvore de decisão, tem-se que o melhor algoritmo em geral para lidar com o conjunto de dados selecionado é a árvore de decisão. 
 
 \section{Conclusão}\label{sec:conclusao}
-Diante do exposto acima, nota-se que a acurácia de teste dos algoritmos de árvore de decisão e rede neural não superaram em muito o modelo \textit{baseline} criado. Além disso, as acurácias de ambos os algoritmos são relativamente similares.  Considerando que o tempo de treinamento da rede neural é consideravelmente maior do que o da árvore de decisão, tem-se que o melhor algoritmo em geral para lidar com o conjunto de dados selecionado é a árvore de decisão. 
 
-Contudo, cabe mencionar que outras técnicas poderiam ser testadas na tentativa de melhorar a acurácia, como substituir a seleção de características por extração de características através de técnicas de redução de dimensionalidade \textit{embedding-based}. Apesar disso, considerando as informações contidas no conjunto de dados analisado e com base no que se sabe acerca do contexto do problema, tem-se que o maior problema é a falta de informações mais relevantes e decisivas acerca da partida, como a quantidade de ouro coletada, mortes, abates, assistências, tempo de partida, entre outros. 
 
-Por fim, ressalta-se que a ferramenta GitHub foi utilizada como sistema de versionamento no decorrer do desenvolvimento deste trabalho, de forma que as contribuições dos integrantes desta equipe possam ser registradas e vistas. Neste repositório encontra-se um arquivo \texttt{.ipynb} (i.e., um Jupyter Notebook) informando de maneira mais detalhada o tratamento da base de dados, a seleção de atributos, a aplicação dos algoritmos e os resultados obtidos. Todas essas contribuições adicionais podem ser encontradas em \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}.
+Tendo em mente o exposto, cabe mencionar que outras técnicas poderiam ser testadas na tentativa de melhorar a acurácia, como substituir a seleção de características por extração de características através de técnicas de redução de dimensionalidade \textit{embedding-based}. Apesar disso, considerando as informações contidas no conjunto de dados analisado e com base no que se sabe acerca do contexto do problema, tem-se que o maior problema é a falta de informações mais relevantes e decisivas acerca da partida, como a quantidade de ouro coletada, mortes, abates, assistências, tempo de partida, entre outros. 
+
+Assim, ressalta-se que a ferramenta GitHub foi utilizada como sistema de versionamento no decorrer do desenvolvimento deste trabalho, de forma que as contribuições dos integrantes desta equipe possam ser registradas e vistas. Neste repositório encontra-se um arquivo \texttt{.ipynb} (i.e., um Jupyter Notebook) informando de maneira mais detalhada o tratamento da base de dados, a seleção de atributos, a aplicação dos algoritmos e os resultados obtidos. Todas essas contribuições adicionais podem ser encontradas em \textbf{\href{https://github.com/ygarasab/data-classification}{@ygarasab/data-classification}}.
 
 
 \bibliographystyle{sbc}
